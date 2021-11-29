@@ -1,12 +1,10 @@
-#!/usr/bin/env python3
-
 from os.path import basename, splitext
 import tkinter as tk
 
-# from tkinter import ttk
+# from tkinter import ttk what???
 
 
-class Application(tk.Tk):
+class Appka(tk.Tk):
     name = basename(splitext(basename(__file__.capitalize()))[0])
     name = "Foo"
 
@@ -26,5 +24,5 @@ class Application(tk.Tk):
         super().quit()
 
 
-app = Application()
+app = Appka()
 app.mainloop()
