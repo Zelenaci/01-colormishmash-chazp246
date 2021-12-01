@@ -1,9 +1,6 @@
 from os.path import basename, splitext
 import tkinter as tk
-from tkinter.constants import HORIZONTAL
-
-# from tkinter import ttk what???
-
+import random
 
 class Appka(tk.Tk):
     name = basename(splitext(basename(__file__.capitalize()))[0])
@@ -14,6 +11,7 @@ class Appka(tk.Tk):
         self.title(self.name)
 
         self.bind("<Escape>", self.quit)
+        self.bind("<r>", self.random)
         
         self.lblR = tk.Label(self, text="R")
         self.lblR.pack()
@@ -32,17 +30,6 @@ class Appka(tk.Tk):
         
         self.canvasmain = tk.Canvas(width=255, height=255, background="#000000")
         self.canvasmain.pack()
-        
-        """
-        self.btn = tk.Button(self, text="Quit", command=self.quit)
-        self.btn.pack()
-        
-        self.btn2 = tk.Button(self, text="About2", command=self.quit)
-        self.btn2.pack()
-
-        self.btn3 = tk.Button(self, text="About3", command=self.quit)
-        self.btn3.pack()
-        """
 
     def change(self, event):
         r = self.scaleR.get()
@@ -50,9 +37,13 @@ class Appka(tk.Tk):
         b = self.scaleB.get()
         self.canvasmain.config(background=f"#{r:02x}{g:02x}{b:02x}")
 
-    def quit(self, event=None):
+    def quit(self, event = None):
         super().quit()
 
+    def random(self, event = None):
+        r = self.scaleR.set(random.randint(1, 255))
+        g = self.scaleG.set(random.randint(1, 255))
+        b = self.scaleB.set(random.randint(1, 255))
 
 app = Appka()
 app.mainloop()
