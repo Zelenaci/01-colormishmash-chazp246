@@ -13,19 +13,19 @@ class Appka(tk.Tk):
         self.bind("<Escape>", self.quit)
         self.bind("<r>", self.random)
         
-        self.lblR = tk.Label(self, text="R")
+        self.lblR = tk.Label(self, text="R",fg = "#000000")
         self.lblR.pack()
-        self.scaleR = tk.Scale(from_ = 0, to = 255, orient = tk.HORIZONTAL, length = 256, command=self.change)
+        self.scaleR = tk.Scale(from_ = 0, to = 255, orient = tk.HORIZONTAL, length = 256, command = self.change, fg = "#ff0000", border = 2)
         self.scaleR.pack()
 
         self.lblG = tk.Label(self, text="G")
         self.lblG.pack()
-        self.scaleG = tk.Scale(from_ = 0, to = 255, orient = tk.HORIZONTAL, length = 256, command=self.change)
+        self.scaleG = tk.Scale(from_ = 0, to = 255, orient = tk.HORIZONTAL, length = 256, command = self.change, fg = "#00ff00", border = 2)
         self.scaleG.pack()
 
         self.lblB = tk.Label(self, text="B")
         self.lblB.pack()
-        self.scaleB= tk.Scale(from_ = 0, to = 255, orient = tk.HORIZONTAL, length = 256, command=self.change)
+        self.scaleB = tk.Scale(from_ = 0, to = 255, orient = tk.HORIZONTAL, length = 256, command = self.change, fg = "#0000ff", border = 2)
         self.scaleB.pack()
         
         self.canvasmain = tk.Canvas(width=255, height=255, background="#000000")
