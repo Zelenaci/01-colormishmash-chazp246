@@ -11,17 +11,16 @@ class Appka(tk.Tk):
         super().__init__(className=self.name)
         self.title(self.name)
         self.bind("<Escape>", self.quit)
-        self.bind("<r>", self.random)
-        self.varR = tk.StringVar()
-        self.varG = tk.StringVar()
-        self.varB = tk.StringVar()
+        self.varR = tk.IntVar()
+        self.varG = tk.IntVar()
+        self.varB = tk.IntVar()
 
 
         self.frameR = tk.Frame(self)
         self.frameR.pack()
         self.lblR = tk.Label(self.frameR, text = "R",fg = "#000000")
         self.lblR.pack(side = tk.LEFT, anchor = tk.S)
-        self.scaleR = tk.Scale(self.frameR, from_ = 0, to = 255, orient = tk.HORIZONTAL, length = 256, command = self.change, fg = "#ff0000", border = 2, variable = self.varR)
+        self.scaleR = tk.Scale(self.frameR, from_ = 0, to = 255, orient = tk.HORIZONTAL, length = 256, fg = "#ff0000", border = 2, variable = self.varR)
         self.scaleR.pack(side = tk.LEFT, anchor = tk.S)
         self.entryR = tk.Entry(self.frameR, width = 3, textvariable = self.varR)
         self.entryR.pack(side = tk.LEFT, anchor = tk.S)
@@ -30,7 +29,7 @@ class Appka(tk.Tk):
         self.frameG.pack()
         self.lblG = tk.Label(self.frameG, text = "G")
         self.lblG.pack(side = tk.LEFT, anchor = tk.S)
-        self.scaleG = tk.Scale(self.frameG, from_ = 0, to = 255, orient = tk.HORIZONTAL, length = 256, command = self.change, fg = "#00ff00", border = 2, variable = self.varG)
+        self.scaleG = tk.Scale(self.frameG, from_ = 0, to = 255, orient = tk.HORIZONTAL, length = 256, fg = "#00ff00", border = 2, variable = self.varG)
         self.scaleG.pack(side = tk.LEFT, anchor = tk.S)
         self.entryG = tk.Entry(self.frameG, width = 3, textvariable = self.varG)
         self.entryG.pack(side = tk.LEFT, anchor = tk.S)
@@ -39,31 +38,61 @@ class Appka(tk.Tk):
         self.frameB.pack()
         self.lblB = tk.Label(self.frameB, text = "B")
         self.lblB.pack(side = tk.LEFT, anchor = tk.S)
-        self.scaleB = tk.Scale(self.frameB, from_ = 0, to = 255, orient = tk.HORIZONTAL, length = 256, command = self.change, fg = "#0000ff", border = 2, variable = self.varB)
+        self.scaleB = tk.Scale(self.frameB, from_ = 0, to = 255, orient = tk.HORIZONTAL, length = 256, fg = "#0000ff", border = 2, variable = self.varB)
         self.scaleB.pack(side = tk.LEFT, anchor = tk.S)
         self.entryB = tk.Entry(self.frameB, width = 3, textvariable = self.varB)
         self.entryB.pack(side = tk.LEFT, anchor = tk.S)
         
         self.canvasmain = tk.Canvas(width = 255, height = 255, background = "#000000")
         self.canvasmain.pack()
+        self.varMain = tk.StringVar()
+        self.entryMain = tk.Entry(self, textvariable=self.varMain,state="readonly",readonlybackground="#00ff00")
+        self.canvasmain.bind("<Button-1>", self.mousehandler)
+        self.entryMain.pack()
+        self.varR.trace("w", self.change)
+        self.varG.trace("w", self.change)
+        self.varB.trace("w", self.change)
 
-    def change(self, event):
+        
+        self.frameMem = tk.Frame(self)
+        self.frameMem.pack()
+        self.canvasMem = []
+        f = open("barvy_last.txt","r")
+        for row in range(3):
+            for column in range(7):
+                background = f.readline().rstrip("\n")
+                canvas = tk.Canvas(self.frameMem, width=50, height=50, background = background)
+                canvas.grid(row=row ,column=column)
+                canvas.bind("<Button-1>", self.mousehandler)
+                self.canvasMem.append(canvas)
+
+
+    def mousehandler(self, event):
+        if self.cget("cursor") != "pencil":
+            self.config(cursor="pencil")
+            self.color = event.widget.cget("background")
+        elif self.cget("cursor") == "pencil":
+            self.config(cursor="")
+            event.widget.config(background=self.color)
+
+    def change(self,var, index, event):
         r = self.scaleR.get()
         g = self.scaleG.get()
         b = self.scaleB.get()
         self.varR.set(r)
         self.varG.set(g)
         self.varB.set(b)
-        self.canvasmain.config(background = f"#{r:02x}{g:02x}{b:02x}")
-
+        colorstring = f"#{r:02x}{g:02x}{b:02x}"
+        self.canvasmain.config(background = colorstring)
+        self.varMain.set(colorstring)
 
     def quit(self, event = None):
+        self.barvy_last()
         super().quit()
 
-    def random(self, event = None):
-        self.scaleR.set(random.randint(1, 255))
-        self.scaleG.set(random.randint(1, 255))
-        self.scaleB.set(random.randint(1, 255))
-
+    def barvy_last(self, event = None):
+        
+        pass
+        
 app = Appka()
 app.mainloop()
