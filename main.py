@@ -11,6 +11,7 @@ class Appka(tk.Tk):
         super().__init__(className=self.name)
         self.title(self.name)
         self.bind("<Escape>", self.quit)
+        self.protocol("WM_DELETE_WINDOW", self.quit)
         self.varR = tk.IntVar()
         self.varG = tk.IntVar()
         self.varB = tk.IntVar()
@@ -43,7 +44,7 @@ class Appka(tk.Tk):
         self.entryB = tk.Entry(self.frameB, width = 3, textvariable = self.varB)
         self.entryB.pack(side = tk.LEFT, anchor = tk.S)
         
-        self.canvasmain = tk.Canvas(width = 255, height = 255, background = "#000000")
+        self.canvasmain = tk.Canvas(width = 255, height = 255, background = "#ffffff")
         self.canvasmain.pack()
         self.varMain = tk.StringVar()
         self.entryMain = tk.Entry(self, textvariable=self.varMain,state="readonly",readonlybackground="#00ff00")
@@ -73,10 +74,10 @@ class Appka(tk.Tk):
             self.color = event.widget.cget("background")
         elif self.cget("cursor") == "pencil":
             self.config(cursor="")
+            event.widget.config()
             event.widget.config(background=self.color)
-        
         barva = event.widget["bg"]
-        try:
+        if event.widget is not self.canvasmain:
             pozice = str(str(event.widget).split(".!")[2])
             pozice = pozice.replace("canvas", "", 1)
             if pozice == "":
@@ -84,10 +85,11 @@ class Appka(tk.Tk):
             else:
                 pozice = int(pozice)
             self.canvasMem[pozice - 1] = barva
-        except:
+        else:
+            self.canvasColor2Slides(self.canvasmain)
             pass
 
-    def change(self, var, index, event):
+    def change(self, var = None, index = None, event = None):
         r = self.scaleR.get()
         g = self.scaleG.get()
         b = self.scaleB.get()
@@ -97,6 +99,22 @@ class Appka(tk.Tk):
         colorstring = f"#{r:02x}{g:02x}{b:02x}"
         self.canvasmain.config(background = colorstring)
         self.varMain.set(colorstring)
+        self.entryMain.delete(0, tk.END)
+        self.entryMain.insert(0, colorstring)
+
+
+    def canvasColor2Slides(self, canvas):
+        barva = canvas.cget("background")
+        r = int(barva[1:3], 16)
+        g = int(barva[3:5], 16)
+        b = int(barva[5:7], 16) 
+        self.varR.set(r)
+        self.varG.set(g)
+        self.varB.set(b)
+        self.scaleR.set(r)
+        self.scaleG.set(g)
+        self.scaleB.set(b)
+        self.change()
 
     def quit(self, event = None):
         self.barvy_last()
