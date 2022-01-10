@@ -65,8 +65,6 @@ class Appka(tk.Tk):
                     canvas.grid(row=row ,column=column)
                     canvas.bind("<Button-1>", self.mousehandler)
                     self.canvasMem.append(canvas.cget("background"))
-        
-        #print(self.canvasMem[0])
 
 
     def mousehandler(self, event):
@@ -85,13 +83,11 @@ class Appka(tk.Tk):
                 pozice = 1
             else:
                 pozice = int(pozice)
-            print(type(pozice))
-            print(pozice)
             self.canvasMem[pozice - 1] = barva
         except:
             pass
 
-    def change(self,var, index, event):
+    def change(self, var, index, event):
         r = self.scaleR.get()
         g = self.scaleG.get()
         b = self.scaleB.get()
@@ -108,13 +104,9 @@ class Appka(tk.Tk):
 
     def barvy_last(self, event = None):
         with open("barvy_last.txt", "w") as f:
-            #print(len(self.canvasMem))
             for i in range(len(self.canvasMem)):
-                #print(i)
                 f.write(f"{self.canvasMem[i]}\n")
 
-
-        pass
         
 app = Appka()
 app.mainloop()
