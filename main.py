@@ -58,14 +58,23 @@ class Appka(tk.Tk):
         self.frameMem = tk.Frame(self)
         self.frameMem.pack()
         self.canvasMem = []
-        with open("barvy_last.txt","r") as f:
+        try:
+            with open("barvy_last.txt","r") as f:
+                pass
+        except:
+            f = open("barvy_last.txt", "w")
+            f.close()
+        with open("barvy_last.txt","r") as f: 
             for row in range(3):
                 for column in range(7):
                     background = f.readline().rstrip("\n")
+                    if background == "":
+                        background = "#ffffff"
                     canvas = tk.Canvas(self.frameMem, width=50, height=50, background = background)
                     canvas.grid(row=row ,column=column)
                     canvas.bind("<Button-1>", self.mousehandler)
                     self.canvasMem.append(canvas.cget("background"))
+
 
 
     def mousehandler(self, event):
