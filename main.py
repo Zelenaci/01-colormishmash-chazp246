@@ -57,14 +57,16 @@ class Appka(tk.Tk):
         self.frameMem = tk.Frame(self)
         self.frameMem.pack()
         self.canvasMem = []
-        f = open("barvy_last.txt","r")
-        for row in range(3):
-            for column in range(7):
-                background = f.readline().rstrip("\n")
-                canvas = tk.Canvas(self.frameMem, width=50, height=50, background = background)
-                canvas.grid(row=row ,column=column)
-                canvas.bind("<Button-1>", self.mousehandler)
-                self.canvasMem.append(canvas)
+        with open("barvy_last.txt","r") as f:
+            for row in range(3):
+                for column in range(7):
+                    background = f.readline().rstrip("\n")
+                    canvas = tk.Canvas(self.frameMem, width=50, height=50, background = background)
+                    canvas.grid(row=row ,column=column)
+                    canvas.bind("<Button-1>", self.mousehandler)
+                    self.canvasMem.append(canvas.cget("background"))
+        
+        #print(self.canvasMem[0])
 
 
     def mousehandler(self, event):
@@ -74,6 +76,20 @@ class Appka(tk.Tk):
         elif self.cget("cursor") == "pencil":
             self.config(cursor="")
             event.widget.config(background=self.color)
+        
+        barva = event.widget["bg"]
+        try:
+            pozice = str(str(event.widget).split(".!")[2])
+            pozice = pozice.replace("canvas", "", 1)
+            if pozice == "":
+                pozice = 1
+            else:
+                pozice = int(pozice)
+            print(type(pozice))
+            print(pozice)
+            self.canvasMem[pozice - 1] = barva
+        except:
+            pass
 
     def change(self,var, index, event):
         r = self.scaleR.get()
@@ -91,7 +107,13 @@ class Appka(tk.Tk):
         super().quit()
 
     def barvy_last(self, event = None):
-        
+        with open("barvy_last.txt", "w") as f:
+            #print(len(self.canvasMem))
+            for i in range(len(self.canvasMem)):
+                #print(i)
+                f.write(f"{self.canvasMem[i]}\n")
+
+
         pass
         
 app = Appka()
