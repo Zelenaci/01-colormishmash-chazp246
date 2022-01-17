@@ -1,6 +1,5 @@
 from os.path import basename, splitext
 import tkinter as tk
-import random
 from tkinter.constants import COMMAND
 
 class Appka(tk.Tk):
