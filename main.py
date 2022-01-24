@@ -1,45 +1,138 @@
-#!/usr/bin/env python3
-
 from os.path import basename, splitext
 import tkinter as tk
+from tkinter.constants import COMMAND
 
-# from tkinter import ttk
-
-
-class About(tk.Toplevel):
-    def __init__(self, parent):
-        super().__init__(parent, class_=parent.name)
-        self.config()
-
-        btn = tk.Button(self, text="Konec", command=self.close)
-        btn.pack()
-
-    def close(self):
-        self.destroy()
-
-
-class Application(tk.Tk):
+class Appka(tk.Tk):
     name = basename(splitext(basename(__file__.capitalize()))[0])
-    name = "Foo"
+    name = "Udělátko"
 
     def __init__(self):
         super().__init__(className=self.name)
         self.title(self.name)
         self.bind("<Escape>", self.quit)
-        self.lbl = tk.Label(self, text="Hello World")
-        self.lbl.pack()
-        self.btn = tk.Button(self, text="Quit", command=self.quit)
-        self.btn.pack()
-        self.btn2 = tk.Button(self, text="About", command=self.about)
-        self.btn2.pack()
+        self.protocol("WM_DELETE_WINDOW", self.quit)
+        self.varR = tk.IntVar()
+        self.varG = tk.IntVar()
+        self.varB = tk.IntVar()
 
-    def about(self):
-        window = About(self)
-        window.grab_set()
 
-    def quit(self, event=None):
+        self.frameR = tk.Frame(self)
+        self.frameR.pack()
+        self.lblR = tk.Label(self.frameR, text = "R",fg = "#000000")
+        self.lblR.pack(side = tk.LEFT, anchor = tk.S)
+        self.scaleR = tk.Scale(self.frameR, from_ = 0, to = 255, orient = tk.HORIZONTAL, length = 256, fg = "#ff0000", border = 2, variable = self.varR)
+        self.scaleR.pack(side = tk.LEFT, anchor = tk.S)
+        self.entryR = tk.Entry(self.frameR, width = 3, textvariable = self.varR)
+        self.entryR.pack(side = tk.LEFT, anchor = tk.S)
+
+        self.frameG = tk.Frame(self)
+        self.frameG.pack()
+        self.lblG = tk.Label(self.frameG, text = "G")
+        self.lblG.pack(side = tk.LEFT, anchor = tk.S)
+        self.scaleG = tk.Scale(self.frameG, from_ = 0, to = 255, orient = tk.HORIZONTAL, length = 256, fg = "#00ff00", border = 2, variable = self.varG)
+        self.scaleG.pack(side = tk.LEFT, anchor = tk.S)
+        self.entryG = tk.Entry(self.frameG, width = 3, textvariable = self.varG)
+        self.entryG.pack(side = tk.LEFT, anchor = tk.S)
+
+        self.frameB = tk.Frame(self)
+        self.frameB.pack()
+        self.lblB = tk.Label(self.frameB, text = "B")
+        self.lblB.pack(side = tk.LEFT, anchor = tk.S)
+        self.scaleB = tk.Scale(self.frameB, from_ = 0, to = 255, orient = tk.HORIZONTAL, length = 256, fg = "#0000ff", border = 2, variable = self.varB)
+        self.scaleB.pack(side = tk.LEFT, anchor = tk.S)
+        self.entryB = tk.Entry(self.frameB, width = 3, textvariable = self.varB)
+        self.entryB.pack(side = tk.LEFT, anchor = tk.S)
+        
+        self.canvasmain = tk.Canvas(width = 255, height = 255, background = "#ffffff")
+        self.canvasmain.pack()
+        self.varMain = tk.StringVar()
+        self.entryMain = tk.Entry(self, textvariable=self.varMain,state="readonly",readonlybackground="#00ff00")
+        self.canvasmain.bind("<Button-1>", self.mousehandler)
+        self.entryMain.pack()
+        self.varR.trace("w", self.change)
+        self.varG.trace("w", self.change)
+        self.varB.trace("w", self.change)
+
+        
+        self.frameMem = tk.Frame(self)
+        self.frameMem.pack()
+        self.canvasMem = []
+        try:
+            with open("barvy_last.txt","r") as f:
+                pass
+        except:
+            f = open("barvy_last.txt", "w")
+            f.close()
+        with open("barvy_last.txt","r") as f: 
+            for row in range(3):
+                for column in range(7):
+                    background = f.readline().rstrip("\n")
+                    if background == "":
+                        background = "#ffffff"
+                    canvas = tk.Canvas(self.frameMem, width=50, height=50, background = background)
+                    canvas.grid(row=row ,column=column)
+                    canvas.bind("<Button-1>", self.mousehandler)
+                    self.canvasMem.append(canvas.cget("background"))
+
+
+
+    def mousehandler(self, event):
+        if self.cget("cursor") != "pencil":
+            self.config(cursor="pencil")
+            self.color = event.widget.cget("background")
+        elif self.cget("cursor") == "pencil":
+            self.config(cursor="")
+            event.widget.config()
+            event.widget.config(background=self.color)
+        barva = event.widget["bg"]
+        if event.widget is not self.canvasmain:
+            pozice = str(str(event.widget).split(".!")[2])
+            pozice = pozice.replace("canvas", "", 1)
+            if pozice == "":
+                pozice = 1
+            else:
+                pozice = int(pozice)
+            self.canvasMem[pozice - 1] = barva
+        else:
+            self.canvasColor2Slides(self.canvasmain)
+            pass
+
+    def change(self, var = None, index = None, event = None):
+        r = self.scaleR.get()
+        g = self.scaleG.get()
+        b = self.scaleB.get()
+        self.varR.set(r)
+        self.varG.set(g)
+        self.varB.set(b)
+        colorstring = f"#{r:02x}{g:02x}{b:02x}"
+        self.canvasmain.config(background = colorstring)
+        self.varMain.set(colorstring)
+        self.entryMain.delete(0, tk.END)
+        self.entryMain.insert(0, colorstring)
+
+
+    def canvasColor2Slides(self, canvas):
+        barva = canvas.cget("background")
+        r = int(barva[1:3], 16)
+        g = int(barva[3:5], 16)
+        b = int(barva[5:7], 16) 
+        self.varR.set(r)
+        self.varG.set(g)
+        self.varB.set(b)
+        self.scaleR.set(r)
+        self.scaleG.set(g)
+        self.scaleB.set(b)
+        self.change()
+
+    def quit(self, event = None):
+        self.barvy_last()
         super().quit()
 
+    def barvy_last(self, event = None):
+        with open("barvy_last.txt", "w") as f:
+            for i in range(len(self.canvasMem)):
+                f.write(f"{self.canvasMem[i]}\n")
 
-app = Application()
+        
+app = Appka()
 app.mainloop()
